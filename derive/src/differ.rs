@@ -57,7 +57,7 @@ fn statements(path: &Cow<Path>, data: &Data) -> TokenStream {
                 unimplemented!()
             }
         },
-        Data::Enum(_) | Data::Union(_) => unimplemented!(),
+        Data::Union(_) => unimplemented!(),
     }
 }
 
