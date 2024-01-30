@@ -1,5 +1,3 @@
-fn main() {}
-
 #[cfg(test)]
 mod tests {
     use differ_from_spec::DifferFromSpec;
@@ -12,6 +10,17 @@ mod tests {
         pub count: Option<u8>,
         pub sub: Option<DemoSub>,
         pub status: Option<DemoEnum>,
+    }
+
+    #[derive(DifferFromSpec, PartialEq)]
+    struct DemoSub {
+        pub team: Option<String>,
+        pub sub: Option<DemoSubSub>,
+    }
+
+    #[derive(DifferFromSpec, PartialEq)]
+    struct DemoSubSub {
+        pub name: Option<String>,
     }
 
     #[derive(DifferFromSpec, PartialEq)]
@@ -33,11 +42,6 @@ mod tests {
         }
     }
 
-    #[derive(DifferFromSpec, PartialEq)]
-    struct DemoSub {
-        pub team: String,
-    }
-
     #[test]
     fn should_not_differ() {
         let spec = Demo {
@@ -45,7 +49,10 @@ mod tests {
             team: Some("bar".into()),
             enabled: Some(true),
             count: Some(1),
-            sub: None,
+            sub: Some(DemoSub {
+                team: Some("bar".into()),
+                sub: None,
+            }),
             status: None,
         };
         let actual = Demo {
@@ -53,7 +60,12 @@ mod tests {
             team: Some("bar".into()),
             enabled: Some(true),
             count: Some(1),
-            sub: Some(DemoSub { team: "bar".into() }),
+            sub: Some(DemoSub {
+                team: Some("bar".into()),
+                sub: Some(DemoSubSub {
+                    name: Some("subsub".into()),
+                }),
+            }),
             status: Some(DemoEnum::Foo),
         };
         assert!(!actual.differ_from_spec(&spec));
@@ -66,7 +78,12 @@ mod tests {
             team: Some("bar".into()),
             enabled: Some(true),
             count: Some(1),
-            sub: Some(DemoSub { team: "xxx".into() }),
+            sub: Some(DemoSub {
+                team: Some("xxx".into()),
+                sub: Some(DemoSubSub {
+                    name: Some("subsub".into()),
+                }),
+            }),
             status: Some(DemoEnum::Bar),
         };
         let actual = Demo {
@@ -74,8 +91,13 @@ mod tests {
             team: Some("bar".into()),
             enabled: Some(true),
             count: Some(1),
-            sub: Some(DemoSub { team: "bar".into() }),
-            status: None,
+            sub: Some(DemoSub {
+                team: Some("bar".into()),
+                sub: Some(DemoSubSub {
+                    name: Some("subsub".into()),
+                }),
+            }),
+            status: Some(DemoEnum::Bar),
         };
         assert!(actual.differ_from_spec(&spec));
     }
