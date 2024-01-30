@@ -29,6 +29,13 @@ pub fn expand_derive_differ_from_spec(input: &mut DeriveInput) -> Result<TokenSt
 
 fn statements(path: &Cow<Path>, data: &Data) -> TokenStream {
     match *data {
+        Data::Enum(ref data) => {
+            quote! {
+                if &self != &spec {
+                    return true;
+                }
+            }
+        }
         Data::Struct(ref data) => match data.fields {
             Fields::Named(ref fields) => {
                 let recurse = fields.named.iter().map(|f| {

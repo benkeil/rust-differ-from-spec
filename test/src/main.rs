@@ -11,6 +11,13 @@ mod tests {
         pub enabled: Option<bool>,
         pub count: Option<u8>,
         pub sub: Option<DemoSub>,
+        pub status: Option<DemoEnum>,
+    }
+
+    #[derive(DifferFromSpec, PartialEq)]
+    enum DemoEnum {
+        Foo,
+        Bar,
     }
 
     impl Default for Demo {
@@ -21,6 +28,7 @@ mod tests {
                 enabled: None,
                 count: None,
                 sub: None,
+                status: None,
             }
         }
     }
@@ -38,6 +46,7 @@ mod tests {
             enabled: Some(true),
             count: Some(1),
             sub: None,
+            status: None,
         };
         let actual = Demo {
             name: "foo".into(),
@@ -45,6 +54,7 @@ mod tests {
             enabled: Some(true),
             count: Some(1),
             sub: Some(DemoSub { team: "bar".into() }),
+            status: Some(DemoEnum::Foo),
         };
         assert!(!actual.differ_from_spec(&spec));
     }
@@ -57,6 +67,7 @@ mod tests {
             enabled: Some(true),
             count: Some(1),
             sub: Some(DemoSub { team: "xxx".into() }),
+            status: Some(DemoEnum::Bar),
         };
         let actual = Demo {
             name: "foo".into(),
@@ -64,6 +75,7 @@ mod tests {
             enabled: Some(true),
             count: Some(1),
             sub: Some(DemoSub { team: "bar".into() }),
+            status: None,
         };
         assert!(actual.differ_from_spec(&spec));
     }
