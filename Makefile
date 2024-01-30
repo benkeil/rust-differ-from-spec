@@ -1,5 +1,5 @@
 test-expand:
-	RUSTFLAGS='--cfg test' cargo expand
+	cd test && RUSTFLAGS='--cfg test' cargo expand
 
 test:
-	cargo test
+	cd test && cargo test -- --nocapture

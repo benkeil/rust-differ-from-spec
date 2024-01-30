@@ -1,9 +1,9 @@
 [package]
-name = "differ-from-spec"
+name = "differ-from-spec-test"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-differ-from-spec-derive = { path = "derive" }
+differ-from-spec = { path = "../" }
