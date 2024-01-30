@@ -63,7 +63,6 @@ fn statements(path: &Cow<Path>, data: &Data) -> TokenStream {
 
 fn wrap_in_const(path: Cow<Path>, code: TokenStream) -> TokenStream {
     let use_block = quote! {
-        // use #path::DifferFromSpec;
         extern crate #path as _differ_from_spec;
     };
 
