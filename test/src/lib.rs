@@ -2,108 +2,160 @@
 mod tests {
     use differ_from_spec::DifferFromSpec;
 
-    #[derive(DifferFromSpec, PartialEq)]
-    struct Demo {
-        pub name: String,
-        pub team: Option<String>,
-        pub enabled: Option<bool>,
-        pub count: Option<u8>,
-        pub asd: DemoSubSub,
-        pub sub: Option<DemoSub>,
-        pub status: Option<DemoEnum>,
+    #[derive(Debug, PartialEq, DifferFromSpec)]
+    pub struct RepositoryResponse {
+        pub full_name: String,
+        pub security_and_analysis: Option<SecurityAndAnalysisResponse>,
+        pub delete_branch_on_merge: Option<bool>,
+        pub allow_auto_merge: Option<bool>,
+        pub allow_squash_merge: Option<bool>,
+        pub allow_merge_commit: Option<bool>,
+        pub allow_rebase_merge: Option<bool>,
+        pub allow_update_branch: Option<bool>,
     }
 
-    #[derive(DifferFromSpec, PartialEq)]
-    struct DemoSub {
-        pub team: Option<String>,
-        pub sub: Option<DemoSubSub>,
+    #[derive(Debug, PartialEq, DifferFromSpec, Default)]
+    pub struct SecurityAndAnalysisResponse {
+        pub secret_scanning: Option<SecurityAndAnalysisStatusResponse>,
+        pub secret_scanning_push_protection: Option<SecurityAndAnalysisStatusResponse>,
+        pub dependabot_security_updates: Option<SecurityAndAnalysisStatusResponse>,
+        pub secret_scanning_validity_checks: Option<SecurityAndAnalysisStatusResponse>,
     }
 
-    #[derive(DifferFromSpec, PartialEq)]
-    struct DemoSubSub {
-        pub name: Option<String>,
+    #[derive(Debug, PartialEq, DifferFromSpec, Default)]
+    pub struct SecurityAndAnalysisStatusResponse {
+        pub status: Status,
     }
 
-    #[derive(DifferFromSpec, PartialEq)]
-    enum DemoEnum {
-        Foo,
-        Bar,
+    #[derive(Debug, PartialEq, DifferFromSpec, Default)]
+    pub enum Status {
+        Enabled,
+        #[default]
+        Disabled,
     }
 
-    impl Default for Demo {
+    impl Default for RepositoryResponse {
         fn default() -> Self {
             Self {
-                name: "foo".into(),
-                team: None,
-                enabled: None,
-                count: None,
-                asd: DemoSubSub { name: None },
-                sub: None,
-                status: None,
+                full_name: "my-repo".into(),
+                security_and_analysis: None,
+                delete_branch_on_merge: None,
+                allow_auto_merge: None,
+                allow_squash_merge: None,
+                allow_merge_commit: None,
+                allow_rebase_merge: None,
+                allow_update_branch: None,
             }
         }
     }
 
     #[test]
-    fn should_not_differ() {
-        let spec = Demo {
-            name: "foo".into(),
-            team: Some("bar".into()),
-            enabled: Some(true),
-            count: Some(1),
-            asd: DemoSubSub { name: None },
-            sub: Some(DemoSub {
-                team: Some("bar".into()),
-                sub: None,
-            }),
-            status: None,
+    fn github_should_not_differ_simple_option() {
+        let spec = RepositoryResponse {
+            ..Default::default()
         };
-        let actual = Demo {
-            name: "foo".into(),
-            team: Some("bar".into()),
-            enabled: Some(true),
-            count: Some(1),
-            asd: DemoSubSub { name: None },
-            sub: Some(DemoSub {
-                team: Some("bar".into()),
-                sub: Some(DemoSubSub {
-                    name: Some("subsub".into()),
-                }),
-            }),
-            status: Some(DemoEnum::Foo),
+        let actual = RepositoryResponse {
+            delete_branch_on_merge: Some(true),
+            ..Default::default()
         };
-        assert!(!actual.differ_from_spec(&spec));
+        assert_eq!(false, actual.differ_from_spec(&spec));
     }
 
     #[test]
-    fn should_differ() {
-        let spec = Demo {
-            name: "foo".into(),
-            team: Some("bar".into()),
-            enabled: Some(true),
-            count: Some(1),
-            asd: DemoSubSub { name: None },
-            sub: Some(DemoSub {
-                team: Some("xxx".into()),
-                sub: Some(DemoSubSub {
-                    name: Some("subsub".into()),
-                }),
-            }),
-            status: Some(DemoEnum::Bar),
+    fn github_should_not_differ_struct_option() {
+        let spec = RepositoryResponse {
+            ..Default::default()
         };
-        let actual = Demo {
-            name: "foo".into(),
-            team: Some("bar".into()),
-            enabled: Some(true),
-            count: Some(1),
-            asd: DemoSubSub { name: None },
-            sub: Some(DemoSub {
-                team: Some("bar".into()),
-                sub: Some(DemoSubSub {
-                    name: Some("subsub".into()),
-                }),
+        let actual = RepositoryResponse {
+            security_and_analysis: Some(SecurityAndAnalysisResponse {
+                ..Default::default()
             }),
-            status: Some(DemoEnum::Bar),
+            ..Default::default()
+        };
+        assert_eq!(false, actual.differ_from_spec(&spec));
+    }
+
+    #[test]
+    fn github_should_not_differ_nested_struct_option() {
+        let spec = RepositoryResponse {
+            ..Default::default()
+        };
+        let actual = RepositoryResponse {
+            security_and_analysis: Some(SecurityAndAnalysisResponse {
+                secret_scanning: Some(SecurityAndAnalysisStatusResponse {
+                    status: Status::Enabled,
+                }),
+                ..Default::default()
+            }),
+            ..Default::default()
+        };
+        assert_eq!(false, actual.differ_from_spec(&spec));
+    }
+
+    #[test]
+    fn github_should_differ_simple_option() {
+        let spec = RepositoryResponse {
+            delete_branch_on_merge: Some(true),
+            ..Default::default()
+        };
+        let actual = RepositoryResponse {
+            delete_branch_on_merge: Some(false),
+            ..Default::default()
+        };
+        assert!(actual.differ_from_spec(&spec));
+    }
+
+    #[test]
+    fn github_should_differ_simple_option_acutal_is_none() {
+        let spec = RepositoryResponse {
+            delete_branch_on_merge: Some(true),
+            ..Default::default()
+        };
+        let actual = RepositoryResponse {
+            ..Default::default()
+        };
+        assert!(actual.differ_from_spec(&spec));
+    }
+
+    #[test]
+    fn github_should_differ_struct_option() {
+        let spec = RepositoryResponse {
+            security_and_analysis: Some(SecurityAndAnalysisResponse {
+                secret_scanning: Some(SecurityAndAnalysisStatusResponse {
+                    status: Status::Enabled,
+                }),
+                ..Default::default()
+            }),
+            ..Default::default()
+        };
+        let actual = RepositoryResponse {
+            security_and_analysis: Some(SecurityAndAnalysisResponse {
+                secret_scanning: Some(SecurityAndAnalysisStatusResponse {
+                    status: Status::Disabled,
+                }),
+                ..Default::default()
+            }),
+            ..Default::default()
+        };
+        assert!(actual.differ_from_spec(&spec));
+    }
+
+    #[test]
+    fn github_should_differ_struct_option_actual_none() {
+        let spec = RepositoryResponse {
+            security_and_analysis: Some(SecurityAndAnalysisResponse {
+                secret_scanning: Some(SecurityAndAnalysisStatusResponse {
+                    status: Status::Enabled,
+                }),
+                ..Default::default()
+            }),
+            ..Default::default()
+        };
+        let actual = RepositoryResponse {
+            security_and_analysis: Some(SecurityAndAnalysisResponse {
+                ..Default::default()
+            }),
+            ..Default::default()
         };
         assert!(actual.differ_from_spec(&spec));
     }

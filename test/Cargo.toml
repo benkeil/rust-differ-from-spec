@@ -7,3 +7,6 @@ edition = "2021"
 
 [dependencies]
 differ-from-spec = { path = "../" }
+
+[dev-dependencies]
+#rstest = "0.18.2"
