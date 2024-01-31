@@ -104,7 +104,7 @@ fn github_should_differ_simple_option() {
 }
 
 #[test]
-fn github_should_differ_simple_option_acutal_is_none() {
+fn github_should_differ_simple_option_actual_is_none() {
     let spec = RepositoryResponse {
         delete_branch_on_merge: Some(true),
         ..Default::default()
