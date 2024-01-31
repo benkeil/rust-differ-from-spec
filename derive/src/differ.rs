@@ -12,7 +12,7 @@ pub fn expand_derive_differ_from_spec(input: &mut DeriveInput) -> Result<TokenSt
 
     let path: Cow<Path> = Cow::Owned(parse_quote!(differ_from_spec));
 
-    let body = statements(&path, &input.data);
+    let body = statements(&input.data);
 
     let impl_block = quote! {
         #[automatically_derived]
@@ -27,9 +27,9 @@ pub fn expand_derive_differ_from_spec(input: &mut DeriveInput) -> Result<TokenSt
     Ok(wrap_in_const(path, impl_block))
 }
 
-fn statements(path: &Cow<Path>, data: &Data) -> TokenStream {
+fn statements(data: &Data) -> TokenStream {
     match *data {
-        Data::Enum(ref data) => {
+        Data::Enum(_) => {
             quote! {
                 if &self != &spec {
                     return true;
