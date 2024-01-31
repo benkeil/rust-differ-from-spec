@@ -20,11 +20,12 @@ impl DifferFromSpec for u8 {
     }
 }
 
-impl<T: DifferFromSpec + PartialEq> DifferFromSpec for Option<T> {
+impl<T: DifferFromSpec> DifferFromSpec for Option<T> {
     fn differ_from_spec(&self, spec: &Self) -> bool {
-        if let (Some(some_spec), Some(some_actual)) = (spec, self) {
-            return some_actual.differ_from_spec(some_spec);
+        match (spec, self) {
+            (Some(some_spec), Some(some_actual)) => some_actual.differ_from_spec(some_spec),
+            (Some(_), None) => true,
+            _ => false,
         }
-        false
     }
 }

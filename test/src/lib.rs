@@ -8,6 +8,7 @@ mod tests {
         pub team: Option<String>,
         pub enabled: Option<bool>,
         pub count: Option<u8>,
+        pub asd: DemoSubSub,
         pub sub: Option<DemoSub>,
         pub status: Option<DemoEnum>,
     }
@@ -36,6 +37,7 @@ mod tests {
                 team: None,
                 enabled: None,
                 count: None,
+                asd: DemoSubSub { name: None },
                 sub: None,
                 status: None,
             }
@@ -49,6 +51,7 @@ mod tests {
             team: Some("bar".into()),
             enabled: Some(true),
             count: Some(1),
+            asd: DemoSubSub { name: None },
             sub: Some(DemoSub {
                 team: Some("bar".into()),
                 sub: None,
@@ -60,6 +63,7 @@ mod tests {
             team: Some("bar".into()),
             enabled: Some(true),
             count: Some(1),
+            asd: DemoSubSub { name: None },
             sub: Some(DemoSub {
                 team: Some("bar".into()),
                 sub: Some(DemoSubSub {
@@ -78,6 +82,7 @@ mod tests {
             team: Some("bar".into()),
             enabled: Some(true),
             count: Some(1),
+            asd: DemoSubSub { name: None },
             sub: Some(DemoSub {
                 team: Some("xxx".into()),
                 sub: Some(DemoSubSub {
@@ -91,6 +96,7 @@ mod tests {
             team: Some("bar".into()),
             enabled: Some(true),
             count: Some(1),
+            asd: DemoSubSub { name: None },
             sub: Some(DemoSub {
                 team: Some("bar".into()),
                 sub: Some(DemoSubSub {
