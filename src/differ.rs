@@ -1,3 +1,6 @@
+use std::collections::HashSet;
+use std::hash::Hash;
+
 pub trait DifferFromSpec {
     fn differ_from_spec(&self, spec: &Self) -> bool;
 }
@@ -17,6 +20,27 @@ impl DifferFromSpec for bool {
 impl DifferFromSpec for u8 {
     fn differ_from_spec(&self, spec: &Self) -> bool {
         spec != self
+    }
+}
+
+impl DifferFromSpec for u32 {
+    fn differ_from_spec(&self, spec: &Self) -> bool {
+        spec != self
+    }
+}
+
+impl DifferFromSpec for u64 {
+    fn differ_from_spec(&self, spec: &Self) -> bool {
+        spec != self
+    }
+}
+
+impl<T: DifferFromSpec + Eq + Hash> DifferFromSpec for Vec<T> {
+    fn differ_from_spec(&self, spec: &Self) -> bool {
+        self.len() != spec.len() || {
+            let set = spec.iter().collect::<HashSet<_>>();
+            !self.iter().all(|item| set.contains(item))
+        }
     }
 }
 

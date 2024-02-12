@@ -20,12 +20,12 @@ pub struct SecurityAndAnalysisResponse {
     pub secret_scanning_validity_checks: Option<SecurityAndAnalysisStatusResponse>,
 }
 
-#[derive(Debug, PartialEq, DifferFromSpec, Default)]
+#[derive(Debug, PartialEq, DifferFromSpec, Default, Eq, Hash)]
 pub struct SecurityAndAnalysisStatusResponse {
     pub status: Status,
 }
 
-#[derive(Debug, PartialEq, DifferFromSpec, Default)]
+#[derive(Debug, PartialEq, DifferFromSpec, Default, Eq, Hash)]
 pub enum Status {
     Enabled,
     #[default]
@@ -156,4 +156,39 @@ fn github_should_differ_struct_option_actual_none() {
         ..Default::default()
     };
     assert!(actual.differ_from_spec(&spec));
+}
+
+#[test]
+fn vector_should_not_differ() {
+    let spec = vec![
+        SecurityAndAnalysisStatusResponse {
+            status: Status::Enabled,
+        },
+        SecurityAndAnalysisStatusResponse {
+            status: Status::Disabled,
+        },
+    ];
+    let actual = vec![
+        SecurityAndAnalysisStatusResponse {
+            status: Status::Disabled,
+        },
+        SecurityAndAnalysisStatusResponse {
+            status: Status::Enabled,
+        },
+    ];
+    assert_eq!(false, actual.differ_from_spec(&spec));
+}
+
+#[test]
+fn vector_should_not_differ_different_order() {
+    let spec = vec![Status::Enabled, Status::Disabled];
+    let actual = vec![Status::Disabled, Status::Enabled];
+    assert_eq!(false, actual.differ_from_spec(&spec));
+}
+
+#[test]
+fn vector_should_differ() {
+    let spec = vec![Status::Enabled, Status::Disabled];
+    let actual = vec![Status::Enabled];
+    assert_eq!(true, actual.differ_from_spec(&spec));
 }
